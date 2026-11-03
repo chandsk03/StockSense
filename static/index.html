@@ -1,0 +1,823 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StockSense | Inventory</title>
+
+<style>
+:root {
+    --bg: #f5f7f6;
+    --surface: #ffffff;
+    --text: #172b24;
+    --muted: #718078;
+    --green: #166534;
+    --green-light: #e8f5ec;
+    --border: #e5ebe7;
+    --red: #b42318;
+    --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button { cursor: pointer; }
+
+.app {
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.sidebar {
+    background: #123d2a;
+    color: white;
+    padding: 28px 20px;
+}
+
+.brand {
+    font-size: 23px;
+    font-weight: 750;
+    margin-bottom: 38px;
+}
+
+.brand span { color: #a7e8b8; }
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav a {
+    color: #d3e7db;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 9px;
+}
+
+.nav a:hover, .nav a.active {
+    background: #285a40;
+    color: white;
+}
+
+.sidebar-note {
+    margin-top: 50px;
+    font-size: 12px;
+    color: #b6d0c0;
+    line-height: 1.6;
+}
+
+main {
+    min-width: 0;
+    padding: 32px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+h1 {
+    font-size: 28px;
+    margin: 0 0 7px;
+}
+
+.subtitle, .muted {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.button {
+    border: 0;
+    border-radius: 9px;
+    background: var(--green);
+    color: white;
+    padding: 11px 16px;
+    font-weight: 600;
+}
+
+.button:hover { background: #14532d; }
+
+.button.secondary {
+    background: #edf3ef;
+    color: var(--green);
+}
+
+.button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat, .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.stat { padding: 22px; }
+
+.stat-label {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 750;
+    margin-top: 12px;
+}
+
+.panel {
+    padding: 24px;
+    margin-bottom: 22px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 18px;
+    margin: 0;
+}
+
+input, select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #dce5df;
+    border-radius: 9px;
+    background: white;
+    color: var(--text);
+}
+
+input:focus, select:focus {
+    outline: 2px solid #a7e8b8;
+    border-color: var(--green);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.field label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 7px;
+}
+
+.scanner {
+    background: #f0f8f2;
+    border: 1px dashed #a8cdb3;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.scanner input[type="file"] {
+    background: white;
+    margin: 12px 0;
+}
+
+.scanner p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.search {
+    max-width: 260px;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 480px;
+}
+
+th, td {
+    text-align: left;
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+
+th {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge.warning {
+    background: #fff1e8;
+    color: #a34b12;
+}
+
+.badge.error {
+    background: #fdebea;
+    color: var(--red);
+}
+
+.notice {
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: #edf3ef;
+    margin-top: 14px;
+    font-size: 14px;
+}
+
+.notice.error {
+    background: #fdebea;
+    color: var(--red);
+}
+
+.review-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+    align-items: end;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.review-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 28px;
+}
+
+.hidden { display: none !important; }
+
+@media (max-width: 850px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { padding: 16px 20px; }
+    .brand { margin-bottom: 14px; }
+    .nav { flex-direction: row; flex-wrap: wrap; }
+    .sidebar-note { display: none; }
+    main { padding: 20px; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 560px) {
+    .stats { grid-template-columns: 1fr; }
+    .topbar { align-items: flex-start; flex-direction: column; }
+    .form-grid { grid-template-columns: 1fr; }
+    .review-item { grid-template-columns: 1fr; }
+    .panel { padding: 17px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">Stock<span>Sense</span></div>
+
+        <nav class="nav">
+            <a class="active" href="#dashboard">Dashboard</a>
+            <a href="#scanner">AI Scanner</a>
+            <a href="#inventory">Inventory</a>
+            <a href="#history">Deliveries</a>
+        </nav>
+
+        <div class="sidebar-note">
+            Smart inventory management for small businesses.
+            <br><br>
+            Powered by Meta AI
+        </div>
+    </aside>
+
+    <main>
+        <header class="topbar" id="dashboard">
+            <div>
+                <h1>Inventory overview</h1>
+                <div class="subtitle">
+                    Track stock, deliveries, and inventory discrepancies.
+                </div>
+            </div>
+
+            <button class="button" id="refreshBtn">
+                Refresh data
+            </button>
+        </header>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Total products</div>
+                <div class="stat-value" id="totalProducts">—</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Total units in stock</div>
+                <div class="stat-value" id="totalUnits">—</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Low-stock products</div>
+                <div class="stat-value" id="lowStock">—</div>
+            </div>
+        </div>
+
+        <section class="panel" id="scanner">
+            <div class="panel-header">
+                <div>
+                    <h2>AI delivery scanner</h2>
+                    <p class="subtitle">
+                        Extract products and quantities from delivery photos.
+                    </p>
+                </div>
+                <span class="badge">Muse Spark</span>
+            </div>
+
+            <div class="scanner">
+                <form id="aiForm">
+                    <label for="deliveryPhoto">
+                        Choose a delivery invoice or packing slip
+                    </label>
+
+                    <input
+                        type="file"
+                        id="deliveryPhoto"
+                        accept="image/jpeg,image/png,image/webp"
+                        required
+                    >
+
+                    <button class="button" id="scanBtn">
+                        Scan delivery
+                    </button>
+                </form>
+
+                <p>
+                    Review the extracted products and quantities before
+                    confirming the delivery.
+                </p>
+            </div>
+
+            <div id="aiMessage" class="notice hidden" role="status"></div>
+
+            <div id="review" class="hidden">
+                <h2 style="margin-top:24px">Review extracted items</h2>
+
+                <p class="subtitle">
+                    Match each product to your inventory and verify quantities.
+                </p>
+
+                <div id="reviewItems"></div>
+
+                <div class="review-actions">
+                    <button class="button" id="confirmBtn">
+                        Confirm and update stock
+                    </button>
+
+                    <button class="button secondary" id="cancelBtn">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Add a product</h2>
+            </div>
+
+            <form id="productForm" class="form-grid">
+                <div class="field">
+                    <label for="productName">Product name</label>
+                    <input id="productName" maxlength="100"
+                           placeholder="e.g. Rice bags" required>
+                </div>
+
+                <div class="field">
+                    <label for="openingStock">Opening stock</label>
+                    <input id="openingStock" type="number"
+                           min="0" value="0" required>
+                </div>
+
+                <div class="field">
+                    <label for="minimumStock">Low-stock threshold</label>
+                    <input id="minimumStock" type="number"
+                           min="0" value="5" required>
+                </div>
+
+                <button class="button" type="submit">Add product</button>
+            </form>
+
+            <div id="productMessage" class="notice hidden"></div>
+        </section>
+
+        <section class="panel" id="inventory">
+            <div class="panel-header">
+                <h2>Inventory</h2>
+                <input class="search" id="search"
+                       placeholder="Search products...">
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Stock</th>
+                            <th>Minimum</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel" id="history">
+            <div class="panel-header">
+                <h2>Recent deliveries</h2>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Expected</th>
+                            <th>Received</th>
+                            <th>Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let products = [];
+let extractedItems = [];
+
+async function api(url, options = {}) {
+    const response = await fetch(url, options);
+
+    let data = {};
+    try {
+        data = await response.json();
+    } catch {}
+
+    if (!response.ok) {
+        throw new Error(data.detail || "Request failed");
+    }
+
+    return data;
+}
+
+function showMessage(id, message, error = false) {
+    const element = $(id);
+    element.textContent = message;
+    element.classList.remove("hidden", "error");
+
+    if (error) element.classList.add("error");
+}
+
+function hideMessage(id) {
+    $(id).classList.add("hidden");
+}
+
+function addCell(row, value) {
+    const cell = document.createElement("td");
+    cell.textContent = value;
+    row.appendChild(cell);
+    return cell;
+}
+
+async function refresh() {
+    products = await api("/api/products");
+
+    $("totalProducts").textContent = products.length;
+
+    $("totalUnits").textContent = products.reduce(
+        (sum, product) => sum + product.stock, 0
+    );
+
+    $("lowStock").textContent = products.filter(
+        product => product.stock <= product.min_stock
+    ).length;
+
+    const body = $("inventoryBody");
+    body.replaceChildren();
+
+    const query = $("search").value.trim().toLowerCase();
+
+    const filtered = products.filter(product =>
+        product.name.toLowerCase().includes(query)
+    );
+
+    if (!filtered.length) {
+        const row = body.insertRow();
+        const cell = addCell(row, "No products found");
+        cell.colSpan = 4;
+        cell.className = "empty";
+    }
+
+    filtered.forEach(product => {
+        const row = body.insertRow();
+
+        addCell(row, product.name);
+        addCell(row, product.stock);
+        addCell(row, product.min_stock);
+
+        const status = addCell(row, "");
+        const badge = document.createElement("span");
+
+        badge.className = "badge";
+        badge.textContent = "In stock";
+
+        if (product.stock <= product.min_stock) {
+            badge.className = "badge warning";
+            badge.textContent = "Low stock";
+        }
+
+        status.appendChild(badge);
+    });
+
+    const history = await api("/api/deliveries");
+    const historyBody = $("historyBody");
+    historyBody.replaceChildren();
+
+    if (!history.length) {
+        const row = historyBody.insertRow();
+        const cell = addCell(row, "No deliveries recorded yet");
+        cell.colSpan = 4;
+        cell.className = "empty";
+    }
+
+    history.forEach(delivery => {
+        const row = historyBody.insertRow();
+
+        addCell(row, delivery.name);
+        addCell(row, delivery.expected);
+        addCell(row, delivery.received);
+
+        const difference = delivery.received - delivery.expected;
+        const cell = addCell(row, difference);
+
+        if (difference !== 0) {
+            cell.className = "warning";
+        }
+    });
+}
+
+$("refreshBtn").onclick = async () => {
+    try {
+        await refresh();
+    } catch (error) {
+        alert(error.message);
+    }
+};
+
+$("search").oninput = () => {
+    refresh().catch(error => alert(error.message));
+};
+
+$("productForm").onsubmit = async event => {
+    event.preventDefault();
+
+    try {
+        await api("/api/products", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                name: $("productName").value.trim(),
+                stock: Number($("openingStock").value),
+                min_stock: Number($("minimumStock").value)
+            })
+        });
+
+        event.target.reset();
+        $("openingStock").value = 0;
+        $("minimumStock").value = 5;
+
+        showMessage("productMessage", "Product added successfully.");
+        await refresh();
+
+    } catch (error) {
+        showMessage("productMessage", error.message, true);
+    }
+};
+
+$("aiForm").onsubmit = async event => {
+    event.preventDefault();
+
+    const photo = $("deliveryPhoto").files[0];
+
+    if (!photo) return;
+
+    if (photo.size > 5 * 1024 * 1024) {
+        showMessage("aiMessage", "Image must be under 5 MB.", true);
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", photo);
+
+    $("scanBtn").disabled = true;
+    $("scanBtn").textContent = "Scanning...";
+    $("review").classList.add("hidden");
+
+    showMessage("aiMessage", "Analyzing delivery image...");
+
+    try {
+        const data = await api("/api/ai/extract", {
+            method: "POST",
+            body: formData
+        });
+
+        extractedItems = data.items;
+
+        if (!extractedItems.length) {
+            showMessage("aiMessage", "No products detected.");
+            return;
+        }
+
+        if (!products.length) {
+            showMessage(
+                "aiMessage",
+                "Add products to your inventory before confirming deliveries.",
+                true
+            );
+            return;
+        }
+
+        renderReview();
+        hideMessage("aiMessage");
+
+    } catch (error) {
+        showMessage("aiMessage", error.message, true);
+    } finally {
+        $("scanBtn").disabled = false;
+        $("scanBtn").textContent = "Scan delivery";
+    }
+};
+
+function renderReview() {
+    const container = $("reviewItems");
+    container.replaceChildren();
+
+    extractedItems.forEach((item, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "review-item";
+
+        const productField = document.createElement("div");
+        const productLabel = document.createElement("label");
+        productLabel.textContent = "Inventory product";
+
+        const select = document.createElement("select");
+        select.dataset.index = index;
+        select.required = true;
+
+        products.forEach(product => {
+            const option = document.createElement("option");
+            option.value = product.id;
+            option.textContent = product.name;
+
+            if (product.name.toLowerCase() === item.name.toLowerCase()) {
+                option.selected = true;
+            }
+
+            select.appendChild(option);
+        });
+
+        productField.append(productLabel, select);
+
+        const expectedField = document.createElement("div");
+        const expectedLabel = document.createElement("label");
+        expectedLabel.textContent = "Expected quantity";
+
+        const expected = document.createElement("input");
+        expected.type = "number";
+        expected.min = "0";
+        expected.value = "0";
+        expected.dataset.index = index;
+
+        expectedField.append(expectedLabel, expected);
+
+        const receivedField = document.createElement("div");
+        const receivedLabel = document.createElement("label");
+        receivedLabel.textContent = "Received quantity";
+
+        const received = document.createElement("input");
+        received.type = "number";
+        received.min = "0";
+        received.value = item.quantity;
+        received.dataset.index = index;
+
+        receivedField.append(receivedLabel, received);
+
+        wrapper.append(productField, expectedField, receivedField);
+        container.appendChild(wrapper);
+    });
+
+    $("review").classList.remove("hidden");
+}
+
+$("confirmBtn").onclick = async () => {
+    const rows = [...$("reviewItems").children];
+
+    const items = rows.map(row => ({
+        product_id: Number(row.querySelector("select").value),
+        expected: Number(row.querySelectorAll("input")[0].value),
+        received: Number(row.querySelectorAll("input")[1].value)
+    }));
+
+    if (items.some(item =>
+        !Number.isInteger(item.expected) ||
+        !Number.isInteger(item.received) ||
+        item.expected < 0 ||
+        item.received < 0
+    )) {
+        showMessage("aiMessage", "Enter valid non-negative quantities.", true);
+        return;
+    }
+
+    $("confirmBtn").disabled = true;
+
+    try {
+        await api("/api/ai/confirm", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({items})
+        });
+
+        $("review").classList.add("hidden");
+        $("aiForm").reset();
+
+        showMessage("aiMessage", "Delivery confirmed and stock updated.");
+        await refresh();
+
+    } catch (error) {
+        showMessage("aiMessage", error.message, true);
+    } finally {
+        $("confirmBtn").disabled = false;
+    }
+};
+
+$("cancelBtn").onclick = () => {
+    extractedItems = [];
+    $("review").classList.add("hidden");
+    $("aiForm").reset();
+};
+
+refresh().catch(error => {
+    showMessage("aiMessage", error.message, true);
+});
+</script>
+</body>
+</html>
